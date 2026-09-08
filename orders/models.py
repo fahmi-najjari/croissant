@@ -20,6 +20,7 @@ class Order(models.Model):
 
     class PaymentMethod(models.TextChoices):
         CASH_ON_DELIVERY = "cash_on_delivery", "Cash on delivery"
+        KONNECT = "konnect", "Konnect"
 
     class PaymentStatus(models.TextChoices):
         UNPAID = "unpaid", "Unpaid"
@@ -161,12 +162,14 @@ class OrderItem(models.Model):
 class Payment(models.Model):
     class Method(models.TextChoices):
         CASH_ON_DELIVERY = "cash_on_delivery", "Cash on delivery"
+        KONNECT = "konnect", "Konnect"
 
     class Status(models.TextChoices):
         PENDING = "pending", "Pending"
         PAID = "paid", "Paid"
         FAILED = "failed", "Failed"
         REFUNDED = "refunded", "Refunded"
+        CANCELLED = "cancelled", "Cancelled"
 
     order = models.OneToOneField(
         Order,
@@ -188,6 +191,9 @@ class Payment(models.Model):
         decimal_places=3,
         validators=[MinValueValidator(0)],
     )
+    gateway_payment_ref = models.CharField(max_length=120, unique=True, blank=True, null=True)
+    gateway_payment_url = models.URLField(blank=True)
+    gateway_response = models.JSONField(default=dict, blank=True)
     paid_at = models.DateTimeField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
