@@ -122,3 +122,44 @@ def sync_konnect_payment(payment):
     payment.save(update_fields=["status", "paid_at", "gateway_response", "updated_at"])
     payment.order.save(update_fields=["payment_status", "updated_at"])
     return payment
+
+
+def update_order_status(order, status, admin_note=""):
+    order.status = status
+
+    if admin_note:
+        order.admin_note = admin_note
+
+    if status == Order.Status.CONFIRMED and not order.confirmed_at:
+        order.confirmed_at = timezone.now()
+
+    if status == Order.Status.DELIVERED:
+        order.delivered_at = order.delivered_at or timezone.now()
+
+        if order.payment_method == Order.PaymentMethod.CASH_ON_DELIVERY:
+            payment = order.payment
+            payment.status = Payment.Status.PAID
+            payment.paid_at = payment.paid_at or timezone.now()
+            payment.save(update_fields=["status", "paid_at", "updated_at"])
+
+            order.payment_status = Order.PaymentStatus.PAID
+
+    if status == Order.Status.CANCELLED:
+        order.cancelled_at = order.cancelled_at or timezone.now()
+
+        if order.payment_status == Order.PaymentStatus.UNPAID:
+            order.payment.status = Payment.Status.CANCELLED
+            order.payment.save(update_fields=["status", "updated_at"])
+
+    order.save(
+        update_fields=[
+            "status",
+            "payment_status",
+            "admin_note",
+            "confirmed_at",
+            "delivered_at",
+            "cancelled_at",
+            "updated_at",
+        ]
+    )
+    return order

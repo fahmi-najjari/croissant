@@ -1,0 +1,14 @@
+{
+  "brand": "Croissant",
+  "localeName": "Francais",
+  "heroTitle": "Une vitrine moderne pour votre boulangerie",
+  "heroText": "Un starter Next.js pret a connecter avec votre API Django pour presenter le catalogue, prendre des commandes et suivre les livraisons.",
+  "primaryAction": "Voir le catalogue",
+  "secondaryAction": "Suivre une commande",
+  "panelTitle": "Inclus dans ce starter",
+  "features": [
+    "Routage multilingue avec francais par defaut et arabe en RTL.",
+    "Structure App Router compatible avec Next.js latest.",
+    "Variable NEXT_PUBLIC_API_URL pour connecter le backend Django."
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "brand": "Croissant",
+  "localeName": "العربية",
+  "heroTitle": "واجهة حديثة لمخبزك",
+  "heroText": "بداية جاهزة باستخدام Next.js للاتصال بواجهة Django API وعرض المنتجات واستقبال الطلبات وتتبع التوصيل.",
+  "primaryAction": "عرض القائمة",
+  "secondaryAction": "تتبع طلب",
+  "panelTitle": "الموجود في البداية",
+  "features": [
+    "مسارات متعددة اللغات مع الفرنسية كلغة افتراضية والعربية باتجاه RTL.",
+    "هيكل App Router متوافق مع أحدث Next.js.",
+    "متغير NEXT_PUBLIC_API_URL لربط الواجهة الخلفية Django."
+  ]
+}

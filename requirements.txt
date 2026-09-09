@@ -1,4 +1,6 @@
 Django
 djangorestframework
+django-cors-headers
 psycopg
 Pillow
+requests>=2.32.0
