@@ -1,4 +1,5 @@
 from decimal import Decimal, ROUND_HALF_UP
+import uuid
 
 import requests
 from django.conf import settings
@@ -87,6 +88,27 @@ def create_cod_payment(order):
 
 
 def create_konnect_payment(order):
+    if getattr(settings, "KONNECT_MOCK_PAYMENTS", False):
+        payment_ref = f"mock-{uuid.uuid4().hex[:12]}"
+        pay_url = (
+            f"{settings.FRONTEND_URL.rstrip('/')}/fr/cart"
+            f"?mock_payment_ref={payment_ref}&order={order.order_number}"
+        )
+
+        return Payment.objects.create(
+            order=order,
+            method=Payment.Method.KONNECT,
+            status=Payment.Status.PENDING,
+            amount=order.total,
+            gateway_payment_ref=payment_ref,
+            gateway_payment_url=pay_url,
+            gateway_response={
+                "mock": True,
+                "paymentRef": payment_ref,
+                "payUrl": pay_url,
+            },
+        )
+
     client = KonnectClient()
     response = client.initiate_payment(order)
 
@@ -103,6 +125,18 @@ def create_konnect_payment(order):
 
 def sync_konnect_payment(payment):
     if payment.method != Payment.Method.KONNECT or not payment.gateway_payment_ref:
+        return payment
+
+    if getattr(settings, "KONNECT_MOCK_PAYMENTS", False):
+        payment.gateway_response = {
+            **payment.gateway_response,
+            "mock_synced": True,
+        }
+        payment.status = Payment.Status.PAID
+        payment.paid_at = payment.paid_at or timezone.now()
+        payment.order.payment_status = Order.PaymentStatus.PAID
+        payment.save(update_fields=["status", "paid_at", "gateway_response", "updated_at"])
+        payment.order.save(update_fields=["payment_status", "updated_at"])
         return payment
 
     client = KonnectClient()

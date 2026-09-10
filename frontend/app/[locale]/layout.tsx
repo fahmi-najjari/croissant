@@ -1,4 +1,6 @@
 import { notFound } from "next/navigation";
+import { Footer } from "@/components/Footer";
+import { Providers } from "@/components/Providers";
 import { getDirection, isLocale, locales, type Locale } from "@/i18n/config";
 
 export function generateStaticParams() {
@@ -20,7 +22,12 @@ export default async function LocaleLayout({
 
   return (
     <html lang={locale} dir={getDirection(locale as Locale)}>
-      <body>{children}</body>
+      <body>
+        <Providers>
+          {children}
+          <Footer locale={locale} />
+        </Providers>
+      </body>
     </html>
   );
 }
