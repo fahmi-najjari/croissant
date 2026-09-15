@@ -8,6 +8,7 @@ import {
   getDeliveryZones,
   getProducts,
   localizedName,
+  mediaUrl,
 } from "@/lib/api";
 import { Header } from "../../components/Header";
 
@@ -49,9 +50,13 @@ const homeCopy = {
       "Produits disponibles selon le stock publie par la boulangerie.",
     featured: "Les favoris du moment",
     featuredText: "Produits marques comme populaires dans le catalogue.",
-    aboutTitle: "Une boulangerie pensee pour commander vite",
+    aboutEyebrow: "A propos",
+    aboutTitle: "Le gout du pain fait maison",
     aboutText:
-      "Le site presente le catalogue, filtre les produits disponibles, indique les zones de livraison et prepare le parcours de checkout autour des champs attendus par l'API.",
+      "Chez 23 en voie, chaque fournee est preparee avec soin: croissants au beurre, pains du jour et patisseries simples, genereuses et toujours fraiches. Nous gardons l'esprit d'une boulangerie de quartier, avec un service clair pour commander vite, recuperer en boutique ou se faire livrer.",
+    aboutNote:
+      "Notre promesse: des produits frais, des prix lisibles et une commande facile du catalogue jusqu'au panier.",
+    aboutCta: "Lire notre histoire",
     empty:
       "Ajoutez des produits populaires dans le backend pour les afficher ici.",
   },
@@ -70,9 +75,13 @@ const homeCopy = {
     paymentText: "الدفع عند الاستلام أو عبر Konnect حسب اختيار العميل.",
     featured: "الاكثر طلبا",
     featuredText: "منتجات مميزة من الكتالوج.",
-    aboutTitle: "مخبز مصمم للطلب بسرعة",
+    aboutEyebrow: "من نحن",
+    aboutTitle: "مذاق الخبز الطازج كل يوم",
     aboutText:
-      "يعرض الموقع المنتجات المتاحة ومناطق التوصيل ويمهد لعملية الدفع حسب الحقول المطلوبة في الواجهة الخلفية.",
+      "في 23 en voie نحضر كل دفعة بعناية: كرواسون بالزبدة، خبز يومي وحلويات طازجة بطابع بسيط ولذيذ. نعمل بروح مخبز الحي، مع تجربة طلب سهلة للاستلام من المتجر أو للتوصيل.",
+    aboutNote:
+      "وعدنا لكم: منتجات طازجة، أسعار واضحة، وطلب سريع من الكتالوج إلى السلة.",
+    aboutCta: "اقرأ قصتنا",
     empty: "أضف منتجات مميزة في الخلفية لتظهر هنا.",
   },
 } as const;
@@ -120,6 +129,8 @@ export default async function LocaleHome({ params }: PageProps) {
   const discountedProduct = allProducts.find(
     (product) => product.discount_price,
   );
+  const homeProducts =
+    featuredProducts.length > 0 ? featuredProducts.slice(0, 3) : allProducts.slice(0, 3);
   const cheapestZone = deliveryZones
     .slice()
     .sort((a, b) => Number(a.delivery_fee) - Number(b.delivery_fee))[0];
@@ -264,22 +275,71 @@ export default async function LocaleHome({ params }: PageProps) {
           </Link>
         </div>
 
-        {featuredProducts.length > 0 ? (
+        {homeProducts.length > 0 ? (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {featuredProducts.slice(0, 3).map((product) => (
+            {homeProducts.map((product) => (
               <article
                 key={product.id}
-                className="flex min-h-[190px] flex-col rounded-lg border border-[var(--line)] bg-[var(--surface)] p-5"
+                className="flex min-h-[340px] flex-col overflow-hidden rounded-lg border border-[var(--line)] bg-[var(--surface)]"
               >
-                <p className="mb-2 text-xs font-bold uppercase text-[var(--muted)]">
-                  {localizedName(product.category, locale)}
-                </p>
-                <h3 className="mb-4 text-xl">
-                  {localizedName(product, locale)}
-                </h3>
-                <p className="mt-auto text-2xl font-extrabold text-[var(--foreground)]">
-                  {formatTnd(product.current_price)}
-                </p>
+                <div className="aspect-[4/3] bg-[var(--background-soft)]">
+                  {mediaUrl(product.primary_image?.image) ? (
+                    <img
+                      src={mediaUrl(product.primary_image?.image) ?? ""}
+                      alt={
+                        locale === "ar"
+                          ? product.primary_image?.alt_text_ar ||
+                            localizedName(product, locale)
+                          : product.primary_image?.alt_text_fr ||
+                            localizedName(product, locale)
+                      }
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    <div className="grid h-full place-items-center px-6 text-center text-lg font-bold text-[var(--muted)]">
+                      {localizedName(product, locale)}
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex flex-1 flex-col p-5">
+                  <div className="mb-4 flex items-start justify-between gap-3">
+                    <div>
+                      <p className="mb-1 text-xs font-bold uppercase text-[var(--muted)]">
+                        {localizedName(product.category, locale)}
+                      </p>
+                      <h3 className="text-xl leading-tight">
+                        {localizedName(product, locale)}
+                      </h3>
+                    </div>
+                    {product.discount_price && (
+                      <span className="shrink-0 rounded-full bg-[#f9e2a8] px-3 py-1 text-xs font-bold text-[#6a390f]">
+                        Promo
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="mt-auto flex items-end justify-between gap-4">
+                    <div>
+                      {product.discount_price && (
+                        <p className="text-sm text-[var(--muted)] line-through">
+                          {formatTnd(product.price)}
+                        </p>
+                      )}
+                      <p className="text-2xl font-extrabold text-[var(--foreground)]">
+                        {formatTnd(product.current_price)}
+                      </p>
+                    </div>
+                    <Link
+                      className="rounded-md bg-[var(--button)] px-4 py-2 text-sm font-bold text-white transition-colors hover:bg-[var(--button-hover)]"
+                      href={`/${locale}/catalog?q=${encodeURIComponent(
+                        localizedName(product, locale),
+                      )}`}
+                    >
+                      Voir
+                    </Link>
+                  </div>
+                </div>
               </article>
             ))}
           </div>
@@ -290,17 +350,29 @@ export default async function LocaleHome({ params }: PageProps) {
         )}
       </section>
 
-      <section id="about" className="bg-[var(--cream)] py-12 md:py-16">
+      <section className="bg-[var(--cream)] py-12 md:py-16">
         <div
-          className={`${shellClassName} grid gap-7 md:grid-cols-[0.9fr_1.1fr] md:items-center`}
+          className={`${shellClassName} grid gap-5 md:grid-cols-[0.9fr_1.1fr] md:items-center ${
+            locale === "ar" ? "text-right" : ""
+          }`}
         >
           <div>
             <p className="mb-2 text-sm font-bold uppercase tracking-[0.16em] text-[var(--button-hover)]">
-              23 en voie
+              {t.aboutEyebrow}
             </p>
             <h2 className="text-3xl md:text-4xl">{t.aboutTitle}</h2>
           </div>
-          <p className="text-lg leading-8 text-[var(--muted)]">{t.aboutText}</p>
+          <div>
+            <p className="text-lg leading-8 text-[var(--muted)]">
+              {t.aboutNote}
+            </p>
+            <Link
+              href={`/${locale}/about`}
+              className="mt-5 inline-flex rounded-lg bg-[var(--button)] px-5 py-3 text-sm font-bold text-white transition-colors hover:bg-[var(--button-hover)]"
+            >
+              {t.aboutCta}
+            </Link>
+          </div>
         </div>
       </section>
     </main>

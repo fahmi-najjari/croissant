@@ -58,15 +58,17 @@ export function Header({
   const isRtl = locale === "ar";
   const localePrefix = `/${locale}`;
   const visibleIsAuthenticated = isAuthenticated || auth.isAuthenticated;
-  const accountHref = visibleIsAuthenticated ? `${localePrefix}/account` : `${localePrefix}/signin`;
+  const accountHref = visibleIsAuthenticated
+    ? `${localePrefix}/account`
+    : `${localePrefix}/signin`;
   const accountLabel = visibleIsAuthenticated ? t.account : t.signin;
   const logoutLabel = "logout" in t ? t.logout : "Logout";
   const visibleCartItemsCount = cartItemsCount ?? cart.itemsCount;
 
   const navItems = [
-    { key: "about", label: t.about, href: `${localePrefix}#about` },
-    { key: "catalog", label: t.products, href: `${localePrefix}/catalog` },
     { key: "orders", label: t.orders, href: `${localePrefix}/orders` },
+    { key: "catalog", label: t.products, href: `${localePrefix}/catalog` },
+    { key: "about", label: t.about, href: `${localePrefix}/about` },
   ] as const;
 
   return (
@@ -96,11 +98,24 @@ export function Header({
               priority
             />
           </span>
-          <span className="text-base font-bold text-[var(--foreground)] sm:text-lg">
-            {t.brand}
-          </span>
         </Link>
 
+        <div className="hidden flex-1 justify-center lg:flex">
+          <form
+            action={`/${locale}/catalog`}
+            className="flex w-full max-w-md items-center gap-2 rounded-md border border-[var(--line)] bg-[var(--cream)] px-3 py-2"
+            role="search"
+          >
+            <Search className="h-4 w-4 shrink-0 text-[var(--muted)]" />
+            <input
+              name="q"
+              type="search"
+              aria-label={t.search}
+              placeholder={t.searchPlaceholder}
+              className="min-w-0 flex-1 bg-transparent text-sm text-[var(--foreground)] outline-none placeholder:text-[var(--muted)]"
+            />
+          </form>
+        </div>
         <nav className="hidden items-center gap-1 md:flex">
           {navItems.map((item) => (
             <Link
@@ -117,22 +132,7 @@ export function Header({
           ))}
         </nav>
 
-        <form
-          action={`/${locale}/catalog`}
-          className="ms-auto hidden min-w-[220px] max-w-sm flex-1 items-center gap-2 rounded-md border border-[var(--line)] bg-[var(--cream)] px-3 py-2 lg:flex"
-          role="search"
-        >
-          <Search className="h-4 w-4 shrink-0 text-[var(--muted)]" />
-          <input
-            name="q"
-            type="search"
-            aria-label={t.search}
-            placeholder={t.searchPlaceholder}
-            className="min-w-0 flex-1 bg-transparent text-sm text-[var(--foreground)] outline-none placeholder:text-[var(--muted)]"
-          />
-        </form>
-
-        <div className="ms-auto flex items-center gap-1 sm:gap-2 lg:ms-0">
+        <div className="ms-auto flex items-center gap-1 sm:gap-2">
           <Link
             href={`/${locale === "fr" ? "ar" : "fr"}`}
             className="rounded-md border border-[var(--line)] bg-[var(--cream)] px-3 py-2 text-xs font-bold text-[var(--foreground)] transition-colors hover:bg-[var(--background-soft)]"

@@ -44,7 +44,7 @@ export function Footer({ locale }: FooterProps) {
     { label: t.orders, href: `${localePrefix}/orders` },
     { label: t.cart, href: `${localePrefix}/cart` },
     { label: t.account, href: `${localePrefix}/account` },
-    { label: t.about, href: `${localePrefix}#about` },
+    { label: t.about, href: `${localePrefix}/about` },
   ];
 
   return (
